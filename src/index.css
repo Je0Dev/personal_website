@@ -1,0 +1,158 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
+@import "tailwindcss";
+
+:root {
+  --bg-color: #fdfbf7;
+  --text-color: #111111;
+  --text-color2: #16b411e5;
+  --text-color3: #1297d9e5;
+  --border-color: #111111;
+  --shadow-color: #5c5151;
+  --card-bg: #ffffff;
+  --accent-pink: purple;
+  --accent-cyan: #00CED1;
+  --accent-yellow: rgb(255, 251, 0);
+  --accent-green: #025102;
+  --accent-purple: purple;
+   --accent-violet: violet;
+   --accent-red: #FF0000;
+   --accent-spice:rgb(255, 0, 225);
+}
+
+.dark {
+  --bg-color: #0a0a0a;
+  --text-color: #f0f0f0;
+  --text-color2: #02fc17e5;
+  --text-color3: #07d4d4e5;
+  --border-color: #f0f0f0;
+  --shadow-color: #f0f0f0;
+  --card-bg: #1a1a1a;
+  --accent-pink: #ff00ff;
+  --accent-cyan: #00f9f9;
+  --accent-yellow: orange;
+  --accent-green: #05e505;
+  --accent-purple: #9d00ff;
+  --accent-violet: violet;
+  --accent-red: red;
+  --accent-spice:rgb(255, 0, 225);
+}
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --color-brutal-bg: var(--bg-color);
+  --color-brutal-text: var(--text-color);
+  --color-brutal-border: var(--border-color);
+  --color-brutal-shadow: var(--shadow-color);
+  --color-brutal-card: var(--card-bg);
+  --color-brutal-pink: var(--accent-pink);
+  --color-brutal-cyan: var(--accent-cyan);
+  --color-brutal-yellow: var(--accent-yellow);
+  --color-brutal-green: var(--accent-green);
+  --color-brutal-purple: var(--accent-purple);
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .brutal-shadow {
+    box-shadow: 6px 6px 0px 0px var(--shadow-color);
+  }
+  .brutal-shadow-lg {
+    box-shadow: 10px 10px 0px 0px var(--shadow-color);
+  }
+  .brutal-shadow-hover:hover {
+    box-shadow: 8px 8px 0px 0px var(--shadow-color);
+    transform: translate(-2px, -2px);
+  }
+  .text-outline {
+    -webkit-text-stroke: 1px var(--text-color);
+    color: transparent;
+  }
+  
+  /* Playful Doodles */
+  .doodle-highlight {
+    position: relative;
+    display: inline-block;
+    z-index: 1;
+    white-space: nowrap;
+  }
+  .doodle-highlight::before {
+    content: '';
+    position: absolute;
+    inset: -0.1em -0.3em;
+    background: var(--highlight-color, var(--accent-yellow));
+    z-index: -1;
+    transform: rotate(-2deg);
+    border-radius: 20% 80% 30% 70% / 60% 30% 70% 40%;
+    transition: all 0.3s ease;
+  }
+  .doodle-highlight:hover::before {
+    transform: rotate(2deg) scale(1.05);
+    border-radius: 70% 30% 80% 20% / 40% 70% 30% 60%;
+  }
+
+  .doodle-underline {
+    position: relative;
+    display: inline-block;
+    z-index: 1;
+  }
+  .doodle-underline::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: -2%;
+    width: 104%;
+    height: 8px;
+    background: var(--underline-color, var(--accent-pink));
+    border-radius: 50% 50% 50% 50% / 90% 90% 10% 10%;
+    transform: rotate(-1deg);
+    z-index: -1;
+    transition: all 0.3s ease;
+  }
+  .doodle-underline:hover::after {
+    transform: rotate(1deg) scaleY(1.5);
+  }
+
+  .doodle-circle {
+    position: relative;
+    display: inline-block;
+    z-index: 1;
+  }
+  .doodle-circle::before {
+    content: '';
+    position: absolute;
+    inset: -0.3em -0.5em;
+    border: 4px solid var(--circle-color, var(--accent-cyan));
+    border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+    z-index: -1;
+    transform: rotate(2deg);
+    transition: all 0.3s ease;
+  }
+  .doodle-circle:hover::before {
+    transform: rotate(-2deg) scale(1.05);
+    border-radius: 60% 40% 30% 70% / 50% 40% 50% 60%;
+  }
+
+  .pill-outline {
+    border: 3px solid var(--border-color);
+    border-radius: 9999px;
+    padding: 0.1em 0.5em;
+    display: inline-block;
+  }
+}
