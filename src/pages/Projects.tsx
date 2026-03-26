@@ -16,7 +16,7 @@ export function Projects() {
       tags: ['Java','FXML', 'Maven','Git'],
       links: { github: 'https://github.com/Je0Dev/ImdbCloneApp', demo: 'not available' },
       color: 'bg-[var(--accent-pink)]',
-      image: '/extras/movies1.gif'
+      image: '/personal_website/movies1.gif'
     },
     {
       title: 'CLI Atm SystemTool',
@@ -25,7 +25,7 @@ export function Projects() {
       tags: ['C', 'Makefile', 'Git'],
       links: { github: 'https://github.com/Je0Dev/cli_atm_system' ,demo: 'not available'},
       color: 'bg-[var(--accent-cyan)]',
-      image: '/extras/atm1.gif'
+      image: '/personal_website/atm1.gif'
     },
     {
       title: 'CLI Task Manager SystemTool',
@@ -34,7 +34,7 @@ export function Projects() {
       tags: ['C', 'Makefile', 'Git'],
       links: { github: 'https://github.com/Je0Dev/cli_task_manager_system', demo: 'not available' },
       color: 'bg-[var(--accent-yellow)]',
-      image: '/extras/todo1.gif'
+      image: '/personal_website/todo1.gif'
     },
     {
       title: 'CLI Student Database SystemTool',
@@ -43,7 +43,7 @@ export function Projects() {
       tags: ['C', 'Makefile', 'Git'],
       links: { github: 'https://github.com/Je0Dev/cli_student_database_management_system',demo: 'not available' },
       color: 'bg-[var(--accent-green)]',
-      image: 'https://picsum.photos/seed/game/800/400'
+      image: '/personal_website/db1.gif'
     },
   ];
 

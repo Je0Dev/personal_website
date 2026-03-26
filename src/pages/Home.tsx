@@ -73,7 +73,7 @@ export function Home({ setActiveTab }: { setActiveTab: (tab: string) => void }) 
             className="w-full md:w-64 h-64 shrink-0 rounded-2xl border-4 border-[var(--border-color)] brutal-shadow overflow-hidden relative group"
           >
             <img 
-              src="/extras/gif1.gif" 
+              src="/personal_website/gif1.gif" 
               alt="My Mind" 
               className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
               referrerPolicy="no-referrer"
@@ -129,7 +129,7 @@ export function Home({ setActiveTab }: { setActiveTab: (tab: string) => void }) 
           >
             <div className="aspect-video rounded-xl border-2 border-[var(--border-color)] overflow-hidden relative group">
               <img 
-                src="/extras/gif2.gif" 
+                src="/personal_website/gif2.gif" 
                 alt="Hardware project" 
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 referrerPolicy="no-referrer"

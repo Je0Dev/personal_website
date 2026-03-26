@@ -9,7 +9,7 @@ export function Hardware() {
       description: 'PCBs,FPGAs,Verilog/Vhdl are on my schedule. Stay Tuned!',
       details: 'Nothing to show here for now',
       tags: ['Simulate', 'Design'],
-      image: '/extras/learn1.gif',
+      image: '/personal_website/learn1.gif',
       link: 'nothing for now',
       color: 'bg-[var(--accent-yellow)]'
     },
