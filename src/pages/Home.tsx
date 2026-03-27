@@ -56,7 +56,7 @@ export function Home({ setActiveTab }: { setActiveTab: (tab: string) => void }) 
           </div>
 
           {/* Download CV Button */}
-      <div className="mt-10 mb-1 relative z-10">
+      <div className="./mt-10 mb-1 relative z-10">
         <a 
           href="/my_cv_v1.5.pdf" 
           download="Personal Resume.pdf"
