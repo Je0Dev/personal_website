@@ -58,7 +58,7 @@ export function Home({ setActiveTab }: { setActiveTab: (tab: string) => void }) 
           {/* Download CV Button */}
       <div className="mt-10 mb-1 relative z-10">
         <a 
-          href="/personal_website/my_cv_v1.5.pdf" 
+          href="/my_cv_v1.5.pdf" 
           download="Personal Resume.pdf"
           aria-label="Download my Resume"
           className="inline-flex items-center gap-3 px-10 py-6 rounded-xl font-bold text-white bg-gradient-to-r from-pink-600 to-cyan-600 hover:from-orange-500 hover:to-blue-500 border-b-[4px] border-green-800 active:border-b-0 active:translate-y-1 hover:-translate-y-1 transition-all duration-150 shadow-lg focus:outline-none focus:ring-4 focus:ring-purple-500/50"
