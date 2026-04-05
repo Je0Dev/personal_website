@@ -2,39 +2,84 @@
 @import "tailwindcss";
 
 :root {
-  --bg-color: #fdfbf7;
-  --text-color: #111111;
-  --text-color2: #16b411e5;
-  --text-color3: #1297d9e5;
-  --border-color: #111111;
-  --shadow-color: #5c5151;
+  --bg-color: #faf9f7;
+  --text-color: #1a1a1a;
+  --text-color2: #059669;
+  --text-color3: #0891b2;
+  --border-color: #1a1a1a;
+  --shadow-color: #1a1a1a;
   --card-bg: #ffffff;
-  --accent-pink: purple;
-  --accent-cyan: #00CED1;
-  --accent-yellow: rgb(255, 251, 0);
-  --accent-green: #025102;
-  --accent-purple: purple;
-   --accent-violet: violet;
-   --accent-red: #FF0000;
-   --accent-spice:rgb(255, 0, 225);
+  --accent-pink: #ec4899;
+  --accent-cyan: #06b6d4;
+  --accent-yellow: #f59e0b;
+  --accent-green: #10b981;
+  --accent-purple: #8b5cf6;
+  --accent-violet: #a855f7;
+  --accent-red: #ef4444;
+  --accent-spice: #f43f5e;
+  --bg-secondary: #f3f4f6;
+  --bg-tertiary: #e5e7eb;
 }
 
 .dark {
-  --bg-color: #0a0a0a;
-  --text-color: #f0f0f0;
-  --text-color2: #02fc17e5;
-  --text-color3: #07d4d4e5;
-  --border-color: #f0f0f0;
-  --shadow-color: #f0f0f0;
-  --card-bg: #1a1a1a;
-  --accent-pink: #ff00ff;
-  --accent-cyan: #00f9f9;
-  --accent-yellow: orange;
-  --accent-green: #05e505;
-  --accent-purple: #9d00ff;
-  --accent-violet: violet;
-  --accent-red: red;
-  --accent-spice:rgb(255, 0, 225);
+  --bg-color: #0c0c0c;
+  --text-color: #f5f5f5;
+  --text-color2: #34d399;
+  --text-color3: #22d3ee;
+  --border-color: #f5f5f5;
+  --shadow-color: #f5f5f5;
+  --card-bg: #171717;
+  --accent-pink: #f472b6;
+  --accent-cyan: #22d3ee;
+  --accent-yellow: #fbbf24;
+  --accent-green: #4ade80;
+  --accent-purple: #a78bfa;
+  --accent-violet: #c084fc;
+  --accent-red: #f87171;
+  --accent-spice: #fb7185;
+  --bg-secondary: #262626;
+  --bg-tertiary: #404040;
+}
+
+/* Easter Theme */
+[data-season="easter"] {
+  --accent-pink: #ffb6c1;
+  --accent-cyan: #87ceeb;
+  --accent-yellow: #ffd700;
+  --accent-green: #98fb98;
+  --accent-purple: #dda0dd;
+  --accent-violet: #e6e6fa;
+  --accent-red: #ffb6c1;
+}
+
+/* Christmas Theme */
+[data-season="christmas"] {
+  --accent-pink: #dc143c;
+  --accent-cyan: #1e90ff;
+  --accent-yellow: #ffd700;
+  --accent-green: #228b22;
+  --accent-purple: #8b0000;
+  --accent-red: #dc143c;
+}
+
+/* Summer Theme */
+[data-season="summer"] {
+  --accent-pink: #ff6b6b;
+  --accent-cyan: #00bfff;
+  --accent-yellow: #ffa500;
+  --accent-green: #32cd32;
+  --accent-purple: #ff8c00;
+  --accent-red: #ff4500;
+}
+
+/* Halloween Theme */
+[data-season="halloween"] {
+  --accent-pink: #ff7518;
+  --accent-cyan: #9932cc;
+  --accent-yellow: #ff8c00;
+  --accent-green: #228b22;
+  --accent-purple: #8b008b;
+  --accent-red: #ff4500;
 }
 
 @theme {
@@ -154,5 +199,62 @@ body {
     border-radius: 9999px;
     padding: 0.1em 0.5em;
     display: inline-block;
+  }
+
+  /* Print Styles */
+  @media print {
+    body {
+      background: white !important;
+      color: black !important;
+    }
+    
+    .no-print, 
+    aside, 
+    nav, 
+    button,
+    .fixed,
+    .sticky,
+    [class*="sidebar"],
+    [class*="Sidebar"],
+    [class*="bg-gradient"],
+    [class*="backdrop"] {
+      display: none !important;
+    }
+    
+    main {
+      width: 100% !important;
+      max-width: 100% !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+    
+    .brutal-shadow, .brutal-shadow-hover {
+      box-shadow: none !important;
+      border: 2px solid black !important;
+    }
+    
+    a {
+      color: black !important;
+      text-decoration: underline !important;
+    }
+    
+    img {
+      max-width: 300px !important;
+      filter: grayscale(100%) !important;
+    }
+    
+    h1, h2, h3, h4 {
+      color: black !important;
+    }
+    
+    p, span, div {
+      color: black !important;
+    }
+    
+    .dark {
+      --bg-color: white;
+      --text-color: black;
+      --border-color: black;
+    }
   }
 }

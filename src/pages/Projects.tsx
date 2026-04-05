@@ -1,49 +1,124 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ExternalLink, Github, Search, Filter, X } from 'lucide-react';
-import { desc } from 'motion/react-client';
+import { ExternalLink, Github, Search, Filter, X, Code2, Star, Calendar, Copy } from 'lucide-react';
+import { useToast } from '../components/Toast';
 
-export function Projects() {
-  const [filter, setFilter] = useState('All');
+interface Project {
+  title: string;
+  year: string;
+  description: string;
+  tags: string[];
+  links: { github: string; demo: string };
+  color: string;
+  image: string;
+  featured: boolean;
+  stats: { stars: number; forks: number };
+}
+
+export function Projects({ setActiveTab }: { setActiveTab?: (tab: string) => void }) {
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedProject, setSelectedProject] = useState<typeof projects[0] | null>(null);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const { showToast } = useToast();
 
-  const projects = [
+  const toggleTag = (tag: string) => {
+    if (tag === 'All') {
+      setSelectedTags([]);
+    } else {
+      setSelectedTags(prev => 
+        prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
+      );
+    }
+  };
+
+  const projects: Project[] = [
     {
-      title: 'GUI Imdb Clone',
+      title: 'IMDb Clone Desktop App',
       year: '2025',
-      description: 'A local app clone of the famous IMDb website, built with Java as the backend and FXML as the frontend.',
-      tags: ['Java','FXML', 'Maven','Git'],
-      links: { github: 'https://github.com/Je0Dev/ImdbCloneApp', demo: 'not available' },
+      description: 'A fully functional desktop application replicating IMDb functionality with local database storage, user authentication, and movie rating features.',
+      tags: ['Java', 'JavaFX', 'Maven', 'SQLite', 'Git'],
+      links: { github: 'https://github.com/Je0Dev/ImdbCloneApp', demo: '' },
       color: 'bg-[var(--accent-pink)]',
-      image: '/personal_website/movies1.gif'
+      image: '/personal_website/movies1.gif',
+      featured: true,
+      stats: { stars: 1, forks: 0 }
     },
     {
-      title: 'CLI Atm SystemTool',
+      title: 'CLI ATM System',
       year: '2025-2026',
-      description: 'A local app for simulating a basic ATM system, built with plain C as the backend and frontend',
-      tags: ['C', 'Makefile', 'Git'],
-      links: { github: 'https://github.com/Je0Dev/cli_atm_system' ,demo: 'not available'},
+      description: 'Command-line banking simulation with account management, transaction history, and PIN authentication system.',
+      tags: ['C', 'Makefile', 'Git', 'Linux'],
+      links: { github: 'https://github.com/Je0Dev/cli_atm_system', demo: '' },
       color: 'bg-[var(--accent-cyan)]',
-      image: '/personal_website/atm1.gif'
+      image: '/personal_website/atm1.gif',
+      featured: true,
+      stats: { stars: 1, forks: 0 }
     },
     {
-      title: 'CLI Task Manager SystemTool',
+      title: 'Lang Website',
       year: '2026',
-      description: 'Another local app for simulating a basic Task Manager system, built with plain C.',
-      tags: ['C', 'Makefile', 'Git'],
-      links: { github: 'https://github.com/Je0Dev/cli_task_manager_system', demo: 'not available' },
-      color: 'bg-[var(--accent-yellow)]',
-      image: '/personal_website/todo1.gif'
+      description: 'A language learning platform built with modern web technologies. Interactive lessons and progress tracking.',
+      tags: ['TypeScript', 'React', 'Web Dev', 'Git'],
+      links: { github: 'https://github.com/Je0Dev/lang_website', demo: '' },
+      color: 'bg-[var(--accent-purple)]',
+      image: '/personal_website/lang1.gif',
+      featured: true,
+      stats: { stars: 1, forks: 0 }
     },
     {
-      title: 'CLI Student Database SystemTool',
-      year: '2023',
-      description: 'One more local app for simulating a basic Engineering Department system, built with plain C.',
-      tags: ['C', 'Makefile', 'Git'],
-      links: { github: 'https://github.com/Je0Dev/cli_student_database_management_system',demo: 'not available' },
+      title: 'Neon Vault Web Game',
+      year: '2026',
+      description: 'A cyberpunk-themed web-based puzzle game with neon aesthetics. Navigate through vault challenges.',
+      tags: ['JavaScript', 'HTML/CSS', 'Game Dev', 'Git'],
+      links: { github: 'https://github.com/Je0Dev/neon_vault_web_game_javascript', demo: '' },
       color: 'bg-[var(--accent-green)]',
-      image: '/personal_website/db1.gif'
+      image: '/personal_website/neon1.gif',
+      featured: false,
+      stats: { stars: 0, forks: 0 }
+    },
+    {
+      title: 'Echoes: Fallen Kingdom',
+      year: '2026',
+      description: 'A text-based adventure RPG set in a fallen kingdom. Explore, battle, and uncover ancient secrets.',
+      tags: ['Python', 'Game Dev', 'CLI', 'Git'],
+      links: { github: 'https://github.com/Je0Dev/echoes_fallen_kingdom_game_python', demo: '' },
+      color: 'bg-[var(--accent-yellow)]',
+      image: '/personal_website/echoes1.gif',
+      featured: false,
+      stats: { stars: 0, forks: 0 }
+    },
+    {
+      title: 'ESP32 Timer Sensor',
+      year: '2025',
+      description: 'Off-board timer sensor system using ESP32. Temperature monitoring with wireless data transmission.',
+      tags: ['C++', 'ESP32', 'IoT', 'Sensors', 'Git'],
+      links: { github: 'https://github.com/Je0Dev/esp32OffboardTimerSensor', demo: '' },
+      color: 'bg-[var(--accent-cyan)]',
+      image: '/personal_website/esp1.gif',
+      featured: false,
+      stats: { stars: 1, forks: 0 }
+    },
+    {
+      title: 'CLI Task Manager',
+      year: '2026',
+      description: 'Terminal-based task management system with priority levels, categories, and persistent storage.',
+      tags: ['C', 'Makefile', 'Git', 'Data Structures'],
+      links: { github: 'https://github.com/Je0Dev/cli_task_manager_system', demo: '' },
+      color: 'bg-[var(--accent-yellow)]',
+      image: '/personal_website/todo1.gif',
+      featured: false,
+      stats: { stars: 1, forks: 0 }
+    },
+    {
+      title: 'Student Database System',
+      year: '2023',
+      description: 'Engineering department management system with CRUD operations, search functionality, and report generation.',
+      tags: ['C', 'Makefile', 'Git', 'File I/O'],
+      links: { github: 'https://github.com/Je0Dev/cli_student_database_management_system', demo: '' },
+      color: 'bg-[var(--accent-green)]',
+      image: '/personal_website/db1.gif',
+      featured: false,
+      stats: { stars: 1, forks: 0 }
     },
   ];
 
@@ -54,10 +129,11 @@ export function Projects() {
   }, [projects]);
 
   const filteredProjects = projects.filter(project => {
-    const matchesFilter = filter === 'All' || project.tags.includes(filter);
-    const matchesSearch = project.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          project.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          project.tags.some(t => t.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchesFilter = selectedTags.length === 0 || selectedTags.some(tag => project.tags.includes(tag));
+    const matchesSearch = searchQuery === '' || 
+      project.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      project.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      project.tags.some(t => t.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchesFilter && matchesSearch;
   });
 
@@ -67,49 +143,61 @@ export function Projects() {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      className="max-w-5xl space-y-12"
+      className="max-w-6xl space-y-12"
     >
-      <header className="space-y-4">
-        <h1 className="text-5xl sm:text-7xl font-display font-black text-[var(--text-color)] tracking-tighter uppercase">
-          Personal <span className="doodle-highlight">Projects</span>
-        </h1>
-        <p className="text-xl text-[var(--text-color)] opacity-80 font-medium max-w-2xl">
-          A collection of my software engineering work, ranging from <span className="doodle-highlight">low-level systems programming to full-stack applications</span>. Check my  <span className="doodle-circle">Github</span> for more
+      <header className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-end gap-4">
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-display font-black text-[var(--text-color)] tracking-tight uppercase">
+            My <span className="doodle-highlight">Projects</span>
+          </h1>
+          <span className="text-[var(--text-color)] opacity-60 font-mono text-sm">
+            {projects.length} projects
+          </span>
+        </div>
+        <p className="text-xl text-[var(--text-color)] opacity-70 font-medium max-w-2xl leading-relaxed">
+          A collection of <span className="doodle-underline">software projects</span> ranging from low-level systems programming to full-stack applications. 
+          Check my <span className="doodle-circle text-[var(--accent-pink)]">GitHub</span> for more.
         </p>
       </header>
 
-      <div className="flex flex-col gap-6 bg-[var(--card-bg)] p-6 rounded-2xl border-4 border-[var(--border-color)] brutal-shadow transition-colors">
-        <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-          <div className="flex items-center gap-2 text-[var(--text-color)] font-bold uppercase tracking-widest w-full md:w-auto">
-            <Filter size={20} />
-            <span className="doodle-circle">Filtering</span>
+      <div className="flex flex-col gap-6 bg-[var(--card-bg)] p-6 rounded-3xl border-4 border-[var(--border-color)] brutal-shadow transition-colors">
+        <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
+          <div className="flex items-center gap-3 text-[var(--text-color)] font-bold uppercase tracking-widest">
+            <div className="p-2 bg-[var(--accent-cyan)] rounded-lg">
+              <Filter size={20} className="text-white" />
+            </div>
+            <span>Filter by</span>
           </div>
-          <div className="relative w-full md:w-96 group">
+          <div className="relative w-full lg:w-96 group">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-color)] opacity-50 group-focus-within:opacity-100 transition-opacity" size={20} />
             <input 
               type="text"
-              placeholder="Search projects, descriptions ..."
+              placeholder="Search projects, tags..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-[var(--border-color)] bg-[var(--bg-color)] text-[var(--text-color)] font-bold focus:outline-none focus:ring-4 focus:ring-[var(--accent-pink)] placeholder-[var(--text-color)] placeholder-opacity-50 transition-all"
+              className="w-full pl-12 pr-4 py-4 rounded-xl border-2 border-[var(--border-color)] bg-[var(--bg-color)] text-[var(--text-color)] font-medium focus:outline-none focus:ring-4 focus:ring-[var(--accent-pink)]/30 placeholder-[var(--text-color)] placeholder-opacity-50 transition-all"
             />
           </div>
         </div>
         
-        <div className="flex flex-wrap gap-2 w-full">
-          {allTags.map(tag => (
-            <button
-              key={tag}
-              onClick={() => setFilter(tag)}
-              className={`px-4 py-2 rounded-full text-sm font-bold border-2 border-[var(--border-color)] transition-all ${
-                filter === tag 
-                  ? 'bg-[var(--text-color)] text-[var(--bg-color)] brutal-shadow translate-x-[-2px] translate-y-[-2px]' 
-                  : 'bg-[var(--bg-color)] text-[var(--text-color)] hover:bg-[var(--border-color)] hover:text-[var(--bg-color)]'
-              }`}
-            >
-              {tag}
-            </button>
-          ))}
+        <div className="flex flex-wrap gap-2">
+          {allTags.map((tag, i) => {
+            const colors = ['bg-[var(--accent-pink)]', 'bg-[var(--accent-cyan)]', 'bg-[var(--accent-yellow)]', 'bg-[var(--accent-purple)]', 'bg-[var(--accent-green)]', 'bg-[var(--accent-orange)]', 'bg-[var(--accent-red)]', 'bg-[var(--accent-violet)]'];
+            const isSelected = (tag === 'All' && selectedTags.length === 0) || selectedTags.includes(tag);
+            return (
+              <button
+                key={tag}
+                onClick={() => toggleTag(tag)}
+                className={`px-5 py-2.5 rounded-full text-sm font-bold border-2 border-[var(--border-color)] transition-all ${
+                  isSelected
+                    ? `${colors[i % colors.length]} text-white brutal-shadow translate-x-[-2px] translate-y-[-2px]` 
+                    : 'bg-[var(--bg-color)] text-[var(--text-color)] hover:bg-[var(--border-color)] hover:text-[var(--bg-color)]'
+                }`}
+              >
+                {tag}
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -125,56 +213,91 @@ export function Projects() {
               transition={{ duration: 0.4, delay: i * 0.1 }}
               key={project.title}
               onClick={() => setSelectedProject(project)}
-              className="group flex flex-col justify-between rounded-2xl bg-[var(--card-bg)] border-4 border-[var(--border-color)] brutal-shadow-hover transition-all duration-300 relative overflow-hidden cursor-pointer"
+              className="group flex flex-col justify-between rounded-3xl bg-[var(--card-bg)] border-4 border-[var(--border-color)] brutal-shadow-hover transition-all duration-300 relative overflow-hidden cursor-pointer"
             >
-              <div className="h-48 w-full border-b-4 border-[var(--border-color)] overflow-hidden relative">
-                <img 
-                  src={project.image} 
-                  alt={project.title} 
-                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500"
+              {project.featured && (
+                <div className="absolute top-4 left-4 z-20">
+                  <span className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--accent-yellow)] text-[#111] text-xs font-bold uppercase tracking-wider rounded-full border-2 border-[var(--border-color)]">
+                    <Star size={12} fill="currentColor" />
+                    Featured
+                  </span>
+                </div>
+              )}
+              
+              <div className="relative h-48 sm:h-56 w-full overflow-hidden border-b-4 border-[var(--border-color)]">
+                <img
+                  src={project.image}
+                  alt={project.title}
+                  className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all duration-700 group-hover:scale-110"
                   referrerPolicy="no-referrer"
                 />
-                <div className={`absolute top-0 right-0 w-16 h-16 ${project.color} rounded-bl-full border-b-4 border-l-4 border-[var(--border-color)] z-10 group-hover:scale-125 transition-transform duration-500`} />
+                <div className={`absolute inset-0 bg-gradient-to-t from-[var(--border-color)]/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+                <div className={`absolute top-0 right-0 w-20 h-20 ${project.color} rounded-bl-full border-b-4 border-l-4 border-[var(--border-color)] z-10 group-hover:scale-125 transition-transform duration-500`} />
               </div>
               
               <div className="p-6 space-y-4 relative z-10 flex-1 flex flex-col">
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="text-2xl font-display font-black text-[var(--text-color)] group-hover:underline decoration-4 underline-offset-4">{project.title}</h3>
-                  <span className="text-xs font-bold font-mono text-[var(--bg-color)] bg-[var(--text-color)] px-2 py-1 rounded border-2 border-[var(--border-color)]">
+                <div className="flex justify-between items-start gap-4">
+                  <div className="flex items-center gap-2">
+                    <Code2 size={18} className="text-[var(--accent-cyan)]" />
+                    <span className="text-xs font-bold font-mono text-[var(--text-color)] opacity-60 uppercase tracking-wider">
+                      {project.tags[0]}
+                    </span>
+                  </div>
+                  <span className="text-xs font-bold font-mono text-[var(--bg-color)] bg-[var(--text-color)] px-3 py-1.5 rounded-lg border-2 border-[var(--border-color)]">
                     {project.year}
                   </span>
                 </div>
-                <p className="text-[var(--text-color)] opacity-80 font-medium leading-relaxed flex-1">
+                <h3 className="text-2xl font-display font-black text-[var(--text-color)] group-hover:underline decoration-4 underline-offset-4 leading-tight">
+                  {project.title}
+                </h3>
+                <p className="text-[var(--text-color)] opacity-70 font-medium leading-relaxed flex-1 line-clamp-3">
                   {project.description}
                 </p>
                 <div className="flex flex-wrap gap-2 pt-2">
-                  {project.tags.map(tag => (
-                    <motion.button 
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.95 }}
-                      key={tag} 
-                      onClick={(e) => { e.stopPropagation(); setFilter(tag); }}
-                      className="px-3 py-1 text-xs font-bold font-mono text-[var(--text-color)] bg-[var(--bg-color)] border-2 border-[var(--border-color)] rounded-md uppercase hover:bg-[var(--text-color)] hover:text-[var(--bg-color)] transition-colors cursor-pointer"
-                    >
-                      {tag}
-                    </motion.button>
-                  ))}
+                  {project.tags.slice(0, 4).map((tag, idx) => {
+                    const isSelected = selectedTags.includes(tag);
+                    const colors = ['bg-[var(--accent-pink)]', 'bg-[var(--accent-cyan)]', 'bg-[var(--accent-yellow)]', 'bg-[var(--accent-purple)]', 'bg-[var(--accent-green)]', 'bg-[var(--accent-orange)]', 'bg-[var(--accent-red)]', 'bg-[var(--accent-violet)]'];
+                    const colorIndex = allTags.indexOf(tag) % colors.length;
+                    return (
+                      <motion.button 
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.95 }}
+                        key={tag} 
+                        onClick={(e) => { e.stopPropagation(); toggleTag(tag); }}
+                        className={`px-3 py-1.5 text-xs font-bold font-mono border-2 border-[var(--border-color)] rounded-md uppercase transition-colors cursor-pointer ${
+                          isSelected 
+                            ? `${colors[colorIndex]} text-white` 
+                            : 'text-[var(--text-color)] bg-[var(--bg-color)] hover:bg-[var(--text-color)] hover:text-[var(--bg-color)]'
+                        }`}
+                      >
+                        {tag}
+                      </motion.button>
+                    );
+                  })}
                 </div>
               </div>
 
-              <div className="flex items-center gap-4 px-6 pb-6 pt-4 border-t-2 border-[var(--border-color)] relative z-10 bg-[var(--card-bg)]">
-                {project.links.github && (
-                  <a href={project.links.github} onClick={(e) => e.stopPropagation()} className="flex items-center gap-2 text-[var(--text-color)] hover:text-[var(--accent-pink)] font-bold transition-colors">
-                    <Github size={20} />
-                    <span>Source</span>
-                  </a>
-                )}
-                {project.links.demo && (
-                  <a href={project.links.demo} onClick={(e) => e.stopPropagation()} className="flex items-center gap-2 text-[var(--text-color)] hover:text-[var(--accent-cyan)] font-bold transition-colors">
-                    <ExternalLink size={20} />
-                    <span>Live Demo</span>
-                  </a>
-                )}
+              <div className="flex items-center justify-between px-6 pb-6 pt-4 border-t-2 border-[var(--border-color)] relative z-10 bg-[var(--card-bg)]">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-1 text-xs font-mono text-[var(--text-color)]">
+                    <Star size={14} className="text-[var(--accent-yellow)]" />
+                    <span>{project.stats.stars}</span>
+                  </div>
+                  <div className="flex items-center gap-1 text-xs font-mono text-[var(--text-color)]">
+                    <ExternalLink size={14} className="text-[var(--accent-cyan)]" />
+                    <span>{project.stats.forks}</span>
+                  </div>
+                </div>
+                <a
+                  href={project.links.github}
+                  onClick={(e) => e.stopPropagation()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-4 py-2 bg-[var(--text-color)] text-[var(--bg-color)] text-xs font-bold uppercase tracking-wider rounded-lg border-2 border-[var(--border-color)] hover:bg-[var(--accent-pink)] transition-colors"
+                >
+                  <Github size={14} />
+                  <span className="hidden sm:inline">Code</span>
+                </a>
               </div>
             </motion.div>
           ))}
@@ -185,13 +308,13 @@ export function Projects() {
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="text-center py-20 bg-[var(--card-bg)] border-4 border-[var(--border-color)] rounded-2xl border-dashed"
+          className="text-center py-20 bg-[var(--card-bg)] border-4 border-[var(--border-color)] rounded-3xl border-dashed"
         >
-          <p className="text-3xl font-display font-black text-[var(--text-color)] mb-4">No projects found.</p>
-          <p className="text-[var(--text-color)] opacity-80 font-medium text-lg">Try adjusting your filters or search query.</p>
+          <p className="text-3xl font-display font-black text-[var(--text-color)] mb-4">No projects found 😔</p>
+          <p className="text-[var(--text-color)] opacity-70 font-medium text-lg mb-8">Try adjusting your filters or search query.</p>
           <button 
-            onClick={() => { setFilter('All'); setSearchQuery(''); }}
-            className="mt-6 px-8 py-3 bg-[var(--accent-yellow)] text-[var(--text-color)] font-black uppercase tracking-widest border-4 border-[var(--border-color)] rounded-xl brutal-shadow hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all"
+            onClick={() => { setSelectedTags([]); setSearchQuery(''); }}
+            className="px-8 py-4 bg-[var(--accent-yellow)] text-[var(--text-color)] font-black uppercase tracking-widest border-4 border-[var(--border-color)] rounded-xl brutal-shadow hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all"
           >
             Reset Filters
           </button>
@@ -204,7 +327,7 @@ export function Projects() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md"
             onClick={() => setSelectedProject(null)}
           >
             <motion.div
@@ -212,56 +335,76 @@ export function Projects() {
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 20 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-[var(--card-bg)] border-4 border-[var(--border-color)] rounded-2xl brutal-shadow-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto relative flex flex-col"
+              className="bg-[var(--card-bg)] border-4 border-[var(--border-color)] rounded-3xl brutal-shadow-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto relative flex flex-col"
             >
               <button 
                 onClick={() => setSelectedProject(null)}
-                className="absolute top-4 right-4 p-2 bg-[var(--bg-color)] border-2 border-[var(--border-color)] rounded-full text-[var(--text-color)] hover:bg-[var(--accent-pink)] hover:text-white transition-colors z-20 brutal-shadow"
+                className="absolute top-4 right-4 p-3 bg-[var(--bg-color)] border-2 border-[var(--border-color)] rounded-full text-[var(--text-color)] hover:bg-[var(--accent-pink)] hover:text-white transition-colors z-20 brutal-shadow"
               >
                 <X size={24} />
               </button>
               
-              <div className="h-64 sm:h-80 w-full border-b-4 border-[var(--border-color)] relative shrink-0">
+              <div className="h-72 sm:h-96 w-full border-b-4 border-[var(--border-color)] relative shrink-0">
                 <img 
                   src={selectedProject.image} 
                   alt={selectedProject.title} 
                   className="w-full h-full object-cover"
                   referrerPolicy="no-referrer"
                 />
-                <div className={`absolute top-0 left-0 w-24 h-24 ${selectedProject.color} rounded-br-full border-b-4 border-r-4 border-[var(--border-color)] z-10`} />
+                <div className={`absolute top-0 left-0 w-28 h-28 ${selectedProject.color} rounded-br-full border-b-4 border-r-4 border-[var(--border-color)] z-10`} />
               </div>
               
-              <div className="p-6 sm:p-10 space-y-8">
+              <div className="p-8 sm:p-12 space-y-8">
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
-                  <h2 className="text-4xl sm:text-5xl font-display font-black text-[var(--text-color)] uppercase leading-tight">{selectedProject.title}</h2>
-                  <span className="text-sm font-bold font-mono text-[var(--bg-color)] bg-[var(--text-color)] px-3 py-1 rounded border-2 border-[var(--border-color)] shrink-0">
+                  <div>
+                    <h2 className="text-3xl sm:text-4xl font-display font-black text-[var(--text-color)] uppercase leading-tight mb-2">
+                      {selectedProject.title}
+                    </h2>
+                    <div className="flex items-center gap-2 text-sm font-mono text-[var(--text-color)] opacity-60">
+                      <Calendar size={14} />
+                      {selectedProject.year}
+                    </div>
+                  </div>
+                  <span className="text-sm font-bold font-mono text-[var(--bg-color)] bg-[var(--text-color)] px-4 py-2 rounded-lg border-2 border-[var(--border-color)] shrink-0">
                     {selectedProject.year}
                   </span>
                 </div>
                 
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-3">
                   {selectedProject.tags.map(tag => (
-                    <span key={tag} className="px-3 py-1 text-xs font-bold font-mono text-[var(--text-color)] bg-[var(--bg-color)] border-2 border-[var(--border-color)] rounded-md uppercase">
+                    <span key={tag} className="px-4 py-2 text-sm font-bold font-mono text-[var(--text-color)] bg-[var(--bg-color)] border-2 border-[var(--border-color)] rounded-lg uppercase">
                       {tag}
                     </span>
                   ))}
                 </div>
                 
-                <div className="text-[var(--text-color)] opacity-90 font-medium text-lg leading-relaxed space-y-4">
+                <div className="h-1 w-full bg-[var(--border-color)]" />
+                
+                <div className="text-[var(--text-color)] opacity-90 font-medium text-lg leading-relaxed space-y-6">
                   <p>{selectedProject.description}</p>
-                  <p>This project involved extensive research and development, focusing on optimizing performance and ensuring a seamless user experience. The architecture was designed to be scalable and maintainable, utilizing modern best practices and design patterns.</p>
+                  <p>
+                    This project involved extensive research and development, focusing on optimizing performance and ensuring a seamless user experience. The architecture was designed to be scalable and maintainable, utilizing modern best practices and design patterns. Key challenges included implementing efficient data structures and creating an intuitive user interface.
+                  </p>
                 </div>
                 
                 <div className="flex flex-wrap items-center gap-4 pt-6 border-t-4 border-[var(--border-color)]">
                   {selectedProject.links.github && (
-                    <a href={selectedProject.links.github} className="flex items-center gap-2 px-6 py-3 bg-[var(--text-color)] text-[var(--bg-color)] font-bold uppercase tracking-widest border-4 border-[var(--border-color)] rounded-xl brutal-shadow hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all">
-                      <Github size={20} />
-                      <span>View Source</span>
-                    </a>
+                    <div className="flex gap-2">
+                      <a href={selectedProject.links.github} className="flex items-center gap-3 px-8 py-4 bg-[var(--text-color)] text-[var(--bg-color)] font-bold uppercase tracking-widest border-4 border-[var(--border-color)] rounded-xl brutal-shadow hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all">
+                        <Github size={22} />
+                        <span>View Code</span>
+                      </a>
+                      <button 
+                        onClick={() => { navigator.clipboard.writeText(selectedProject.links.github); showToast('Link copied to clipboard!'); }}
+                        className="p-4 bg-[var(--accent-yellow)] text-[#111] font-bold border-4 border-[var(--border-color)] rounded-xl brutal-shadow hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all"
+                      >
+                        <Copy size={22} />
+                      </button>
+                    </div>
                   )}
                   {selectedProject.links.demo && (
-                    <a href={selectedProject.links.demo} className="flex items-center gap-2 px-6 py-3 bg-[var(--accent-cyan)] text-[var(--text-color)] font-bold uppercase tracking-widest border-4 border-[var(--border-color)] rounded-xl brutal-shadow hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all">
-                      <ExternalLink size={20} />
+                    <a href={selectedProject.links.demo} className="flex items-center gap-3 px-8 py-4 bg-[var(--accent-cyan)] text-[var(--text-color)] font-bold uppercase tracking-widest border-4 border-[var(--border-color)] rounded-xl brutal-shadow hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all">
+                      <ExternalLink size={22} />
                       <span>Live Demo</span>
                     </a>
                   )}

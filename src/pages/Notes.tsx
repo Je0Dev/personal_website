@@ -1,13 +1,27 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Calendar, Clock, ChevronRight, Search, Send, MessageSquare, Tag, X, FileText, Lightbulb } from 'lucide-react';
+import { Calendar, Clock, ChevronRight, Search, Send, MessageSquare, Tag, X, FileText, Lightbulb, Folder, ExternalLink } from 'lucide-react';
 
-export function Notes() {
+interface Note {
+  title: string;
+  date: string;
+  readTime: string;
+  type: 'Article' | 'Thought';
+  tags: string[];
+  excerpt: string;
+  content: string;
+  slug: string;
+  color: string;
+  relatedProjects?: { title: string; link: string }[];
+}
+
+export function Notes({ setActiveTab }: { setActiveTab?: (tab: string) => void }) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterTag, setFilterTag] = useState('All');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [activeCategory, setActiveCategory] = useState<'All' | 'Article' | 'Thought'>('All');
+  const [readingProgress, setReadingProgress] = useState(0);
 
-  const notes = [
+  const notes: Note[] = [
      {
       title: 'Demystifying C-Pointers',
       date: 'March 26, 2026',
@@ -15,10 +29,11 @@ export function Notes() {
       type: 'Article' as const,
       tags: ['C', 'Programming', 'Memory'],
      excerpt: 'Finally understanding pointers in C.',
-      content: 'Pointers are often cited as the most confusing part of the language. At their core, they are just variables that store memory addresses.\n\n Just Imagine memory as a massive array of mailboxes, each with a unique number. A pointer simply holds the number of a specific mailbox (`pointing` to the corresponding unique number).\n\nWhen you use the symbol `*` (dereferencing operator), you are opening the mailbox and looking at its contents (so you basically now have full access to the contents-data). Similary, using the symbol `&` , you are finding the address of the variable (that you want to get access to). So, always remember that a pointer likes knowing `where` something lives, and through him you can change the `contents` of that place',
-       slug: '#',
-       color: 'bg-[var(--accent-green)]'
-     },
+     content: 'Pointers are often cited as the most confusing part of the language. At their core, they are just variables that store memory addresses.\n\n Just Imagine memory as a massive array of mailboxes, each with a unique number. A pointer simply holds the number of a specific mailbox (`pointing` to the corresponding unique number).\n\nWhen you use the symbol `*` (dereferencing operator), you are opening the mailbox and looking at its contents (so you basically now have full access to the contents-data). Similary, using the symbol `&` , you are finding the address of the variable (that you want to get access to). So, always remember that a pointer likes knowing `where` something lives, and through him you can change the `contents` of that place',
+     slug: '#',
+     color: 'bg-[var(--accent-green)]',
+     relatedProjects: [{ title: 'CLI ATM System', link: 'https://github.com/Je0Dev/cli_atm_system' }, { title: 'CLI Task Manager', link: 'https://github.com/Je0Dev/cli_task_manager_system' }, { title: 'Student Database System', link: 'https://github.com/Je0Dev/cli_student_database_management_system' }]
+   },
     {
       title: 'My Journey',
       date: 'March 26, 2026',
@@ -28,7 +43,8 @@ export function Notes() {
       excerpt: 'A personal note to myself and everyone reading this.',
       content: 'Since I first started delving into the vast world of engineering after being accepted to the university where I am currently pursuing my bachelor\'s degree, I have been constantly learning new tools to bring my ideas to life and help others accomplish their goals.\n\n I enjoy improving in as many areas as I can, creating habits that help me better myself every day. The world is changing extremely fast and we can\'t revert time, so my advice is to cherish every moment. No matter what you are going through, stay on the path and keep pushing. Stay on the grind, but keep your side activities and hobbies alive while you\'re at it. I hope this note helps even one of you!',
       slug: '#',
-      color: 'bg-[var(--accent-purple)]'
+      color: 'bg-[var(--accent-purple)]',
+      relatedProjects: []
     },
   ];
 
@@ -41,13 +57,41 @@ export function Notes() {
   }, [notes]);
 
   const filteredNotes = notes.filter(note => {
-    const matchesSearch = note.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          note.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          note.tags.some(t => t.toLowerCase().includes(searchQuery.toLowerCase()));
-    const matchesTag = filterTag === 'All' || note.tags.includes(filterTag);
+    if (searchQuery === '') return activeCategory === 'All' || note.type === activeCategory;
+    
+    const regex = new RegExp(`(${searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    
+    const matchesSearch = regex.test(note.title.toLowerCase()) || 
+                          regex.test(note.excerpt.toLowerCase()) ||
+                          note.tags.some(t => regex.test(t.toLowerCase()));
+    const matchesTag = selectedTags.length === 0 || selectedTags.some(tag => note.tags.includes(tag));
     const matchesCategory = activeCategory === 'All' || note.type === activeCategory;
     return matchesSearch && matchesTag && matchesCategory;
+  }).sort((a, b) => {
+    if (activeCategory === 'All') return 0;
+    const aMatch = a.type === activeCategory ? 0 : 1;
+    const bMatch = b.type === activeCategory ? 0 : 1;
+    return aMatch - bMatch;
   });
+
+  const highlightText = (text: string, query: string) => {
+    if (!query) return text;
+    const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    const parts = text.split(regex);
+    return parts.map((part, i) => 
+      regex.test(part) ? <mark key={i} className="bg-[var(--accent-yellow)] text-[var(--text-color)] px-1 rounded">{part}</mark> : part
+    );
+  };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      setReadingProgress((scrollTop / docHeight) * 100);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
     <motion.div
@@ -57,6 +101,18 @@ export function Notes() {
       transition={{ duration: 0.4, ease: "easeOut" }}
       className="max-w-4xl space-y-20"
     >
+      {/* Reading Progress Bar */}
+      <motion.div 
+        className="fixed top-0 left-0 h-1 z-[200]"
+        style={{ 
+          width: `${readingProgress}%`,
+          background: readingProgress < 33 
+            ? 'var(--accent-pink)' 
+            : readingProgress < 66 
+              ? 'var(--accent-cyan)' 
+              : 'var(--accent-yellow)'
+        }}
+      />
       <section className="space-y-12">
         <header className="space-y-4">
           <h1 className="text-5xl sm:text-7xl font-display font-black text-[var(--text-color)] tracking-tighter uppercase">
@@ -104,19 +160,34 @@ export function Notes() {
               <Tag size={16} />
               <span className="text-xs">Tags:</span>
             </div>
-            {allTags.map(tag => (
-              <button
-                key={tag}
-                onClick={() => setFilterTag(tag)}
-                className={`px-3 py-1 rounded-full text-xs font-bold border-2 border-[var(--border-color)] transition-all ${
-                  filterTag === tag 
-                    ? 'bg-[var(--text-color)] text-[var(--bg-color)] brutal-shadow translate-x-[-2px] translate-y-[-2px]' 
-                    : 'bg-[var(--bg-color)] text-[var(--text-color)] hover:bg-[var(--border-color)] hover:text-[var(--bg-color)]'
-                }`}
-              >
-                {tag}
-              </button>
-            ))}
+            {allTags.map((tag, i) => {
+              const colors = ['bg-[var(--accent-pink)]', 'bg-[var(--accent-cyan)]', 'bg-[var(--accent-yellow)]', 'bg-[var(--accent-purple)]', 'bg-[var(--accent-green)]', 'bg-[var(--accent-orange)]'];
+              const isSelected = tag === 'All' ? selectedTags.length === 0 : selectedTags.includes(tag);
+              const noteWithTag = notes.find(n => n.tags.includes(tag) && (n.relatedProjects && n.relatedProjects.length > 0));
+              const hasRelated = noteWithTag?.relatedProjects && noteWithTag.relatedProjects.length > 0;
+              
+              return (
+                <button
+                  key={tag}
+                  onClick={() => {
+                    if (tag === 'All') {
+                      setSelectedTags([]);
+                    } else {
+                      setSelectedTags(prev => 
+                        prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
+                      );
+                    }
+                  }}
+                  className={`px-3 py-1 rounded-full text-xs font-bold border-2 border-[var(--border-color)] transition-all ${
+                    isSelected
+                      ? `${colors[i % colors.length]} text-white brutal-shadow translate-x-[-2px] translate-y-[-2px]` 
+                      : 'bg-[var(--bg-color)] text-[var(--text-color)] hover:bg-[var(--border-color)] hover:text-[var(--bg-color)]'
+                  }`}
+                >
+                  {tag}
+                </button>
+              );
+            })}
           </div>
         </div>
 
@@ -136,7 +207,7 @@ export function Notes() {
               >
                 <div className={`absolute top-0 left-0 w-4 h-full ${note.color} border-r-4 border-[var(--border-color)] group-hover:w-6 transition-all duration-300`} />
                 <div className="block pl-6">
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-4 text-sm text-[var(--text-color)] font-bold font-mono mb-4 uppercase">
+                  <div className="flex flex-wrap gap-4 text-sm text-[var(--text-color)] font-bold font-mono mb-4 uppercase">
                     <div className="flex items-center gap-2 bg-[var(--bg-color)] px-3 py-1 rounded border-2 border-[var(--border-color)]">
                       {note.type === 'Article' ? <FileText size={16} /> : <Lightbulb size={16} />}
                       <span>{note.type}</span>
@@ -151,10 +222,10 @@ export function Notes() {
                     </div>
                   </div>
                   <h2 className="text-3xl font-display font-black text-[var(--text-color)] group-hover:underline decoration-4 underline-offset-4 mb-4 leading-tight">
-                    {note.title}
+                    {highlightText(note.title, searchQuery)}
                   </h2>
                   <p className="text-[var(--text-color)] opacity-80 font-medium text-lg leading-relaxed mb-6 max-w-2xl">
-                    {note.excerpt}
+                    {highlightText(note.excerpt, searchQuery)}
                   </p>
                   
                   <div className="flex flex-wrap gap-2 mb-6">
@@ -163,7 +234,7 @@ export function Notes() {
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.95 }}
                         key={tag} 
-                        onClick={(e) => { e.stopPropagation(); setFilterTag(tag); }}
+                        onClick={(e) => { e.stopPropagation(); setSelectedTags(prev => prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]); }}
                         className="px-3 py-1 text-xs font-bold font-mono text-[var(--text-color)] bg-[var(--bg-color)] border-2 border-[var(--border-color)] rounded-md uppercase hover:bg-[var(--text-color)] hover:text-[var(--bg-color)] transition-colors cursor-pointer"
                       >
                         {tag}
@@ -189,7 +260,7 @@ export function Notes() {
               <p className="text-3xl font-display font-black text-[var(--text-color)] mb-4">Nothing was found for this category 😔.</p>
               <p className="text-[var(--text-color)] opacity-80 font-medium text-lg">Try adjusting your search query.</p>
               <button 
-                onClick={() => { setSearchQuery(''); setFilterTag('All'); setActiveCategory('All'); }}
+                onClick={() => { setSearchQuery(''); setSelectedTags([]); setActiveCategory('All'); }}
                 className="mt-6 px-8 py-3 bg-[var(--accent-pink)] text-white font-black uppercase tracking-widest border-4 border-[var(--border-color)] rounded-xl brutal-shadow hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all"
               >
                 Reset Filters
@@ -198,74 +269,6 @@ export function Notes() {
           )}
         </div>
       </section>
-
-      <AnimatePresence>
-        {selectedNote && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-            onClick={() => setSelectedNote(null)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              onClick={(e) => e.stopPropagation()}
-              className="bg-[var(--card-bg)] border-4 border-[var(--border-color)] rounded-2xl brutal-shadow-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto relative flex flex-col"
-            >
-              <div className={`h-4 w-full ${selectedNote.color} border-b-4 border-[var(--border-color)] shrink-0`} />
-              
-              <button 
-                onClick={() => setSelectedNote(null)}
-                className="absolute top-8 right-8 p-2 bg-[var(--bg-color)] border-2 border-[var(--border-color)] rounded-full text-[var(--text-color)] hover:bg-[var(--accent-pink)] hover:text-white transition-colors z-20 brutal-shadow"
-              >
-                <X size={24} />
-              </button>
-              
-              <div className="p-8 sm:p-12 space-y-8">
-                <div className="space-y-6">
-                  <div className="flex flex-wrap items-center gap-4 text-sm text-[var(--text-color)] font-bold font-mono uppercase">
-                    <div className="flex items-center gap-2 bg-[var(--bg-color)] px-3 py-1 rounded border-2 border-[var(--border-color)]">
-                      {selectedNote.type === 'Article' ? <FileText size={16} /> : <Lightbulb size={16} />}
-                      <span>{selectedNote.type}</span>
-                    </div>
-                    <div className="flex items-center gap-2 bg-[var(--bg-color)] px-3 py-1 rounded border-2 border-[var(--border-color)]">
-                      <Calendar size={16} />
-                      <span>{selectedNote.date}</span>
-                    </div>
-                    <div className="flex items-center gap-2 bg-[var(--bg-color)] px-3 py-1 rounded border-2 border-[var(--border-color)]">
-                      <Clock size={16} />
-                      <span>{selectedNote.readTime}</span>
-                    </div>
-                  </div>
-                  
-                  <h2 className="text-4xl sm:text-6xl font-display font-black text-[var(--text-color)] uppercase leading-tight">
-                    {selectedNote.title}
-                  </h2>
-                  
-                  <div className="flex flex-wrap gap-2">
-                    {selectedNote.tags.map(tag => (
-                      <span key={tag} className="px-3 py-1 text-xs font-bold font-mono text-[var(--text-color)] bg-[var(--bg-color)] border-2 border-[var(--border-color)] rounded-md uppercase">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-                
-                <div className="h-1 w-full bg-[var(--border-color)]" />
-                
-                <div className="prose prose-lg dark:prose-invert max-w-none text-[var(--text-color)] font-medium leading-relaxed space-y-6">
-                  {selectedNote.content.split('\n\n').map((paragraph, i) => (
-                    <p key={i}>{paragraph}</p>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </motion.div>
   );
 }
