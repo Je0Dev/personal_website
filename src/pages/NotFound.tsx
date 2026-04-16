@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import { Home, ArrowRight, Search } from 'lucide-react';
+import { CatHamburger } from '../components/CatHamburger';
 
 export function NotFound({ setActiveTab }: { setActiveTab: (tab: string) => void }) {
   return (
@@ -10,16 +11,10 @@ export function NotFound({ setActiveTab }: { setActiveTab: (tab: string) => void
       transition={{ duration: 0.4, ease: "easeOut" }}
       className="max-w-2xl mx-auto space-y-12 pt-20"
     >
-      {/* 404 ASCII Art */}
-      <pre className="text-[var(--accent-pink)] opacity-80 font-mono text-center text-xs sm:text-sm leading-tight">
-{`
-  ████████  ████████  ████████  ██       ████████  ████████ 
-     ██     ██          ██     ██       ██       ██       
-     ██     ██████      ██     ██       ██████   ██████   
-     ██     ██          ██     ██       ██       ██       
-     ██     ████████    ██     ████████ ████████ ████████ 
-`}
-      </pre>
+{/* 404 ASCII Art */}
+      <div className="flex justify-center">
+        <CatHamburger size={150} />
+      </div>
 
       <div className="text-center space-y-4">
         <h1 className="text-6xl sm:text-8xl font-display font-black text-[var(--text-color)]">

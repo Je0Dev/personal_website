@@ -55,7 +55,7 @@ export function Hardware({ setActiveTab }: { setActiveTab?: (tab: string) => voi
       details: 'Focusing on learning industry-standard tools and practices. Experimenting with various development boards and components to understand circuit behavior.',
       tags: ['Learning', 'FPGA', 'PCB', 'Verilog'],
       relatedNotes: [],
-      image: '/personal_website/learn1.gif',
+      image: '/learn1.gif',
       link: '#',
       color: 'bg-[var(--accent-yellow)]',
       status: 'learning'
@@ -67,7 +67,7 @@ export function Hardware({ setActiveTab }: { setActiveTab?: (tab: string) => voi
       details: 'First hands-on hardware project. Learned about sensors, microcontrollers, and WiFi communication protocols.',
       tags: ['ESP8266', 'IoT', 'Sensors'],
       relatedNotes: [],
-      image: '/personal_website/learn1.gif',
+      image: '/learn1.gif',
       link: '#',
       color: 'bg-[var(--accent-cyan)]',
       status: 'completed'

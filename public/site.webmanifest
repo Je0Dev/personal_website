@@ -1,0 +1,17 @@
+{
+  "name": "George Mastrogiannis | Software & Hardware Engineer",
+  "short_name": "George M.",
+  "description": "ECE student at University of Patras. Passionate about building elegant solutions that bridge software and hardware.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#111111",
+  "theme_color": "#ec4899",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

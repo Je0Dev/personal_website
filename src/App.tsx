@@ -1,18 +1,27 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense, useRef, useCallback } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { Sidebar } from './components/Sidebar';
 import { SearchModal } from './components/SearchModal';
 import { ToastProvider } from './components/Toast';
-import { Home } from './pages/Home';
-import { Projects } from './pages/Projects';
-import { Hardware } from './pages/Hardware';
-import { Notes } from './pages/Notes';
-import { Contact } from './pages/Contact';
-import { ThankYou } from './pages/ThankYou';
 import { ThemeProvider, useTheme } from './ThemeContext';
 import { SearchProvider, useSearch } from './SearchContext';
+import { SoundProvider, useSound } from './SoundContext';
+import { LanguageProvider } from './LanguageContext';
 import { ChevronUp } from 'lucide-react';
+import { PageLoader } from './components/Spinner';
+import { QuickActionsMenu } from './components/QuickActionsMenu';
+import { AnalyticsDashboard } from './components/AnalyticsDashboard';
+import { Footer } from './components/Footer';
+import { useAnalytics } from './lib/analytics';
+
+const Home = lazy(() => import('./pages/Home').then(m => ({ default: m.Home })));
+const Projects = lazy(() => import('./pages/Projects').then(m => ({ default: m.Projects })));
+const Hardware = lazy(() => import('./pages/Hardware').then(m => ({ default: m.Hardware })));
+const Notes = lazy(() => import('./pages/Notes').then(m => ({ default: m.Notes })));
+const Contact = lazy(() => import('./pages/Contact').then(m => ({ default: m.Contact })));
+const ThankYou = lazy(() => import('./pages/ThankYou').then(m => ({ default: m.ThankYou })));
+const Hobbies = lazy(() => import('./pages/Hobbies').then(m => ({ default: m.HobbiesPage })));
 
 function BackgroundDoodles({ activeTab }: { activeTab: string }) {
   return (
@@ -39,13 +48,52 @@ function MainAppContent() {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [scrollProgress, setScrollProgress] = useState(0);
   const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null);
-  const { theme } = useTheme();
+  const [quickActionsOpen, setQuickActionsOpen] = useState(false);
+  const [analyticsOpen, setAnalyticsOpen] = useState(false);
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const { toggleSearch } = useSearch();
+  const { playScroll } = useSound();
+  const lastScrollTime = useRef(0);
+  useAnalytics();
 
   const tabs = ['home', 'projects', 'hardware', 'notes', 'contact', 'thank-you'];
   const currentIndex = tabs.indexOf(location.pathname.replace('/', '') || 'home');
+
+  useEffect(() => {
+    const handleOpenQuickActions = () => setQuickActionsOpen(true);
+    window.addEventListener('open-quick-actions', handleOpenQuickActions);
+    return () => window.removeEventListener('open-quick-actions', handleOpenQuickActions);
+  }, []);
+
+  // Scroll position storage
+  const scrollPositions = useRef<Record<string, number>>({});
+  
+  const handleNavigate = useCallback((to: string) => {
+    // Check for view transition API support
+    if (document.startViewTransition) {
+      document.startViewTransition(() => {
+        scrollPositions.current[location.pathname] = window.scrollY;
+        navigate(to);
+        const targetScroll = scrollPositions.current[to] || 0;
+        setTimeout(() => window.scrollTo(0, targetScroll), 10);
+      });
+    } else {
+      scrollPositions.current[location.pathname] = window.scrollY;
+      navigate(to);
+      const targetScroll = scrollPositions.current[to] || 0;
+      setTimeout(() => window.scrollTo(0, targetScroll), 10);
+    }
+  }, [navigate, location.pathname]);
+
+  // Restore scroll on location change
+  useEffect(() => {
+    const savedPosition = scrollPositions.current[location.pathname];
+    if (savedPosition) {
+      setTimeout(() => window.scrollTo(0, savedPosition), 10);
+    }
+  }, [location.pathname]);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -57,11 +105,64 @@ function MainAppContent() {
       if (docHeight > 0) {
         setScrollProgress((scrollTop / docHeight) * 100);
       }
+      const now = Date.now();
+      if (now - lastScrollTime.current > 200) {
+        playScroll();
+        lastScrollTime.current = now;
+      }
     };
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === '/' && !['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)) {
+      // Ignore shortcuts when typing in inputs
+      const isTyping = ['INPUT', 'TEXTAREA', 'SELECT'].includes((e.target as HTMLElement).tagName);
+      
+      // Toggle search: /
+      if (e.key === '/' && !isTyping) {
         e.preventDefault();
         toggleSearch();
+      }
+      
+      // Quick actions: Cmd/Ctrl + K
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setQuickActionsOpen(prev => !prev);
+      }
+      
+      // Open analytics: Alt + A
+      if (e.altKey && e.key === 'a') {
+        e.preventDefault();
+        setAnalyticsOpen(prev => !prev);
+      }
+      
+      // Open GitHub: G
+      if (e.key === 'g' && !isTyping && !e.metaKey && !e.ctrlKey) {
+        window.open('https://github.com/Je0Dev', '_blank');
+      }
+      
+      // Open LinkedIn: L
+      if (e.key === 'l' && !isTyping && !e.metaKey && !e.ctrlKey) {
+        window.open('https://www.linkedin.com/in/geomas/', '_blank');
+      }
+      
+      // Toggle theme: Alt + T
+      if (e.altKey && e.key === 't') {
+        e.preventDefault();
+        toggleTheme();
+      }
+      
+      // Go home: Alt + H
+      if (e.altKey && e.key === 'h') {
+        e.preventDefault();
+        navigate('/');
+      }
+      
+      // Scroll to top: Home
+      if (e.key === 'Home') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      
+      // Scroll to bottom: End
+      if (e.key === 'End') {
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
       }
     };
     const handleTouchStart = (e: TouchEvent) => {
@@ -96,27 +197,32 @@ function MainAppContent() {
       window.removeEventListener('touchstart', handleTouchStart);
       window.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [toggleSearch, navigate, currentIndex, tabs, touchStart]);
+  }, [toggleSearch, navigate, currentIndex, tabs, touchStart, playScroll]);
 
   const activeTab = location.pathname.replace('/', '') || 'home';
-  const setActiveTab = (tab: string) => navigate(`/${tab}`);
+  const setActiveTab = (tab: string) => handleNavigate(tab);
 
   return (
     <div className={`min-h-screen bg-[var(--bg-color)] text-[var(--text-color)] selection:bg-[var(--accent-pink)] selection:text-white relative overflow-hidden transition-colors duration-300 ${theme}`}>
       <BackgroundDoodles activeTab={activeTab} />
       <SearchModal />
+      <QuickActionsMenu isOpen={quickActionsOpen} onClose={() => setQuickActionsOpen(false)} navigate={(path) => { navigate(path); setQuickActionsOpen(false); }} toggleTheme={toggleTheme} openAnalytics={() => setAnalyticsOpen(true)} />
+      <AnalyticsDashboard isOpen={analyticsOpen} onClose={() => setAnalyticsOpen(false)} />
       
       <motion.div 
         className="fixed top-20 left-20 w-64 h-64 bg-[var(--accent-pink)] rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-20 dark:opacity-10 pointer-events-none z-0"
-        animate={{ x: mousePos.x * 0.05, y: mousePos.y * 0.05 }}
+        animate={{ x: mousePos.x * 0.05, y: mousePos.y * 0.05, scale: [1, 1.1, 1] }}
+        transition={{ scale: { duration: 4, repeat: Infinity } }}
       />
       <motion.div 
         className="fixed bottom-20 right-20 w-80 h-80 bg-[var(--accent-purple)] rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-20 dark:opacity-10 pointer-events-none z-0"
-        animate={{ x: mousePos.x * -0.05, y: mousePos.y * -0.05 }}
+        animate={{ x: mousePos.x * -0.05, y: mousePos.y * -0.05, scale: [1, 1.15, 1] }}
+        transition={{ scale: { duration: 5, repeat: Infinity } }}
       />
       <motion.div 
         className="fixed top-1/2 left-1/2 w-72 h-72 bg-[var(--accent-cyan)] rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-15 dark:opacity-8 pointer-events-none z-0"
-        animate={{ x: mousePos.x * 0.02, y: mousePos.y * -0.02 }}
+        animate={{ x: mousePos.x * 0.02, y: mousePos.y * -0.02, scale: [1, 1.1, 1] }}
+        transition={{ scale: { duration: 6, repeat: Infinity } }}
       />
       
       <div className="fixed inset-0 pointer-events-none z-0 opacity-[0.05] dark:opacity-[0.1]" style={{ backgroundImage: 'linear-gradient(to right, var(--border-color) 1px, transparent 1px), linear-gradient(to bottom, var(--border-color) 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
@@ -141,53 +247,31 @@ function MainAppContent() {
         </div>
         
         <main className="flex-1 min-h-screen pb-20">
-          <Routes>
-            <Route path="/" element={<Home setActiveTab={setActiveTab} />} />
-            <Route path="projects" element={<Projects setActiveTab={setActiveTab} />} />
-            <Route path="hardware" element={<Hardware setActiveTab={setActiveTab} />} />
-            <Route path="notes" element={<Notes setActiveTab={setActiveTab} />} />
-            <Route path="contact" element={<Contact />} />
-            <Route path="thank-you" element={<ThankYou />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
+          <Suspense fallback={<PageLoader />}>
+            <AnimatePresence mode="wait">
+              <Routes>
+                <Route path="/" element={<Home setActiveTab={setActiveTab} />} />
+                <Route path="projects" element={<Projects setActiveTab={setActiveTab} />} />
+                <Route path="hardware" element={<Hardware setActiveTab={setActiveTab} />} />
+                <Route path="notes" element={<Notes setActiveTab={setActiveTab} />} />
+                <Route path="contact" element={<Contact />} />
+                <Route path="hobbies" element={<Hobbies />} />
+                <Route path="thank-you" element={<ThankYou />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </AnimatePresence>
+          </Suspense>
+          <Footer />
         </main>
         
-        <div className="hidden lg:block w-48 shrink-0">
-          <div className="sticky top-4 p-4 border-4 border-[var(--border-color)] bg-[var(--card-bg)] rounded-3xl brutal-shadow space-y-4">
-            <h3 className="text-sm font-display font-black text-[var(--text-color)] uppercase tracking-wide">
-              Quick Links
-            </h3>
-            <nav className="flex flex-col gap-2">
-              {[
-                { label: 'My GitHub', href: 'https://github.com/Je0Dev', color: 'var(--accent-pink)' },
-                { label: 'LinkedIn', href: 'https://www.linkedin.com/in/geomas/', color: 'var(--accent-cyan)' },
-                { label: 'University', href: 'https://www.upatras.gr/', color: 'var(--accent-purple)' },
-              ].map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm font-bold text-[var(--text-color)] hover:text-white bg-[var(--bg-color)] border-2 border-[var(--border-color)] px-3 py-2 rounded-lg hover:bg-[var(--border-color)] transition-colors"
-                  style={{ borderLeftColor: link.color, borderLeftWidth: '4px' }}
-                >
-                  {link.label}
-                </a>
-              ))}
-            </nav>
-            <div className="pt-4 border-t-2 border-[var(--border-color)]">
-              <p className="text-xs text-[var(--text-color)] opacity-60 mb-2">Current Page</p>
-              <p className="text-sm font-bold text-[var(--accent-cyan)] uppercase">{activeTab}</p>
-            </div>
-          </div>
-        </div>
+        
       </div>
 
       <motion.button
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: scrollProgress > 10 ? 1 : 0, y: scrollProgress > 10 ? 0 : 20 }}
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-        className="fixed bottom-8 right-8 z-[150] p-4 bg-[var(--accent-cyan)] text-[#111] rounded-full border-4 border-[var(--border-color)] brutal-shadow hover:translate-y-[-2px] hover:shadow-none transition-all"
+        className="fixed bottom-8 right-8 z-[150] p-4 bg-[var(--accent-cyan)] text-[#111] rounded border-4 border-[var(--border-color)] brutal-shadow hover:translate-y-[-2px] hover:shadow-none transition-all"
       >
         <ChevronUp size={24} className="font-bold" />
       </motion.button>
@@ -195,14 +279,22 @@ function MainAppContent() {
   );
 }
 
+import { FontProvider } from './components/FontSelector';
+
 export default function App() {
   return (
     <ThemeProvider>
-      <SearchProvider>
-        <ToastProvider>
-          <MainAppContent />
-        </ToastProvider>
-      </SearchProvider>
+      <LanguageProvider>
+        <SearchProvider>
+          <ToastProvider>
+            <SoundProvider>
+              <FontProvider>
+                <MainAppContent />
+              </FontProvider>
+            </SoundProvider>
+          </ToastProvider>
+        </SearchProvider>
+      </LanguageProvider>
     </ThemeProvider>
   );
 }

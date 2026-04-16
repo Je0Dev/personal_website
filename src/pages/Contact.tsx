@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { Send, MessageSquare, AlertCircle, CheckCircle2, Mail, Github, Linkedin, ExternalLink } from 'lucide-react';
+import { useLanguage } from '../LanguageContext';
+import { CatHamburger } from '../components/CatHamburger';
 
 export function Contact() {
   const [formState, setFormState] = useState({ name: '', email: '', message: '' });
   const [errors, setErrors] = useState({ name: '', email: '', message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const { t } = useLanguage();
 
   const validateForm = () => {
     let isValid = true;
@@ -72,13 +75,19 @@ export function Contact() {
       className="max-w-4xl space-y-12"
     >
       <header className="space-y-6">
-        <h1 className="text-5xl sm:text-6xl lg:text-7xl font-display font-black text-[var(--text-color)] tracking-tight uppercase">
-          Let's <span className="doodle-circle">Connect</span>
-        </h1>
-        <p className="text-xl text-[var(--text-color)] opacity-70 font-medium max-w-2xl leading-relaxed">
-          Have a project in mind or just want to chat? Drop me a <span className="doodle-underline">message</span> below 
-          and I'll get back to you as soon as possible.
-        </p>
+        <div className="flex items-start gap-6">
+          <div className="hidden sm:block">
+            <CatHamburger size={120} />
+          </div>
+          <div className="flex-1">
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-display font-black text-[var(--text-color)] tracking-tight uppercase">
+              {t.contact.title}
+            </h1>
+            <p className="text-xl text-[var(--text-color)] opacity-70 font-medium max-w-2xl leading-relaxed mt-4">
+              {t.contact.subtitle}
+            </p>
+          </div>
+        </div>
       </header>
 
       {/* Contact Info Cards */}
@@ -157,7 +166,7 @@ export function Contact() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label htmlFor="name" className="block text-sm font-bold font-mono text-[var(--text-color)] uppercase tracking-wide flex items-center gap-2">
-                  <span>Your Name</span>
+                  <span>{t.contact.name}</span>
                   <span className="text-[var(--accent-red)]">*</span>
                 </label>
                 <input 
@@ -184,6 +193,7 @@ export function Contact() {
               
               <div className="space-y-2">
                 <label htmlFor="email" className="block text-sm font-bold font-mono text-[var(--text-color)] uppercase tracking-wide flex items-center gap-2">
+                  <span>{t.contact.email}</span>
                   <span>Email Address</span>
                   <span className="text-[var(--accent-red)]">*</span>
                 </label>
@@ -212,7 +222,7 @@ export function Contact() {
             
             <div className="space-y-2">
               <label htmlFor="message" className="block text-sm font-bold font-mono text-[var(--text-color)] uppercase tracking-wide flex items-center gap-2">
-                <span>Your Message</span>
+                <span>{t.contact.message}</span>
                 <span className="text-[var(--accent-red)]">*</span>
               </label>
               <textarea 
@@ -228,7 +238,7 @@ export function Contact() {
                     ? 'border-[var(--accent-red)] focus:ring-[var(--accent-red)]/30' 
                     : 'border-[var(--border-color)] focus:ring-[var(--accent-cyan)]/30'
                 }`}
-                placeholder="Tell me about your project or just say hi..."
+                placeholder={t.contact.message}
               ></textarea>
               {errors.message && (
                 <motion.p initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="text-[var(--accent-red)] text-sm font-bold flex items-center gap-1 mt-1">
@@ -255,7 +265,7 @@ export function Contact() {
                 </>
               ) : (
                 <>
-                  <span>Send Message</span>
+                  <span>{t.contact.send}</span>
                   <Send size={20} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                 </>
               )}

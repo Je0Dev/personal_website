@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title><![CDATA[George Mastrogiannis - Notes]]></title>
+    <link>https://je0dev.github.io</link>
+    <description><![CDATA[Technical notes, tutorials, and thoughts on software engineering]]></description>
+    <language>en</language>
+    <lastBuildDate>Thu, 16 Apr 2026 12:00:00 GMT</lastBuildDate>
+    <atom:link href="https://je0dev.github.io/rss.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title><![CDATA[Demystifying C-Pointers]]></title>
+      <link>https://je0dev.github.io/personal_website/notes</link>
+      <description><![CDATA[Finally understanding pointers in C - one of the most confusing concepts.]]></description>
+      <pubDate>Thu, 26 Mar 2026 12:00:00 GMT</pubDate>
+      <guid>https://je0dev.github.io/personal_website/notes/demystifying-c-pointers</guid>
+      <category>C</category>
+      <category>Programming</category>
+      <category>Memory</category>
+    </item>
+    <item>
+      <title><![CDATA[C Makefiles 101]]></title>
+      <link>https://je0dev.github.io/personal_website/notes</link>
+      <description><![CDATA[Learn how to write Makefiles for automating your C build process.]]></description>
+      <pubDate>Fri, 28 Mar 2026 12:00:00 GMT</pubDate>
+      <guid>https://je0dev.github.io/personal_website/notes/c-makefiles-101</guid>
+      <category>C</category>
+      <category>Makefile</category>
+      <category>Build</category>
+    </item>
+    <item>
+      <title><![CDATA[React useState Deep Dive]]></title>
+      <link>https://je0dev.github.io/personal_website/notes</link>
+      <description><![CDATA[Master useState hook - the foundation of React state management.]]></description>
+      <pubDate>Tue, 25 Mar 2026 12:00:00 GMT</pubDate>
+      <guid>https://je0dev.github.io/personal_website/notes/react-usestate-deep-dive</guid>
+      <category>React</category>
+      <category>JavaScript</category>
+      <category>Hooks</category>
+    </item>
+    <item>
+      <title><![CDATA[TypeScript Generics]]></title>
+      <link>https://je0dev.github.io/personal_website/notes</link>
+      <description><![CDATA[Write reusable TypeScript code with generics.]]></description>
+      <pubDate>Sat, 22 Mar 2026 12:00:00 GMT</pubDate>
+      <guid>https://je0dev.github.io/personal_website/notes/typescript-generics</guid>
+      <category>TypeScript</category>
+      <category>Programming</category>
+    </item>
+    <item>
+      <title><![CDATA[Python Virtual Environments]]></title>
+      <link>https://je0dev.github.io/personal_website/notes</link>
+      <description><![CDATA[Isolate your Python projects with venv.]]></description>
+      <pubDate>Wed, 18 Mar 2026 12:00:00 GMT</pubDate>
+      <guid>https://je0dev.github.io/personal_website/notes/python-virtual-environments</guid>
+      <category>Python</category>
+      <category>Environment</category>
+    </item>
+    <item>
+      <title><![CDATA[ESP32 Getting Started]]></title>
+      <link>https://je0dev.github.io/personal_website/notes</link>
+      <description><![CDATA[Begin your ESP32 journey with this quickstart guide.]]></description>
+      <pubDate>Sun, 15 Mar 2026 12:00:00 GMT</pubDate>
+      <guid>https://je0dev.github.io/personal_website/notes/esp32-getting-started</guid>
+      <category>ESP32</category>
+      <category>IoT</category>
+      <category>Embedded</category>
+    </item>
+    <item>
+      <title><![CDATA[Python List Comprehensions]]></title>
+      <link>https://je0dev.github.io/personal_website/notes</link>
+      <description><![CDATA[Master list comprehensions for cleaner, more Pythonic code.]]></description>
+      <pubDate>Thu, 20 Mar 2026 12:00:00 GMT</pubDate>
+      <guid>https://je0dev.github.io/personal_website/notes/python-list-comprehensions</guid>
+      <category>Python</category>
+      <category>Programming</category>
+    </item>
+    <item>
+      <title><![CDATA[React useEffect Best Practices]]></title>
+      <link>https://je0dev.github.io/personal_website/notes</link>
+      <description><![CDATA[Understanding useEffect dependencies and cleanup functions.]]></description>
+      <pubDate>Sun, 15 Mar 2026 12:00:00 GMT</pubDate>
+      <guid>https://je0dev.github.io/personal_website/notes/react-useeffect-best-practices</guid>
+      <category>React</category>
+      <category>JavaScript</category>
+      <category>Hooks</category>
+    </item>
+    <item>
+      <title><![CDATA[My Journey]]></title>
+      <link>https://je0dev.github.io/personal_website/notes</link>
+      <description><![CDATA[A personal note to myself and everyone reading this.]]></description>
+      <pubDate>Wed, 26 Mar 2026 12:00:00 GMT</pubDate>
+      <guid>https://je0dev.github.io/personal_website/notes/my-journey</guid>
+      <category>Life</category>
+      <category>Learning</category>
+    </item>
+    <item>
+      <title><![CDATA[SQL JOINs Explained]]></title>
+      <link>https://je0dev.github.io/personal_website/notes</link>
+      <description><![CDATA[Understanding different types of SQL JOINs with examples.]]></description>
+      <pubDate>Mon, 10 Mar 2026 12:00:00 GMT</pubDate>
+      <guid>https://je0dev.github.io/personal_website/notes/sql-joins-explained</guid>
+      <category>SQL</category>
+      <category>Database</category>
+      <category>Programming</category>
+    </item>
+  </channel>
+</rss>
